@@ -1,7 +1,10 @@
 // HTML elements
-const quizDisplay = document.querySelector('.quiz');
+const appName = document.createElement('h2');
+const line = document.createElement('hr');
+const quizDisplay = document.createElement('p');
 const container = document.querySelector('.container');
 let index = 1;
+let score = 0;
 
 // Quiz data
 const quizzes = {
@@ -34,33 +37,66 @@ const quizzes = {
 
 // Function to display the current quiz
 function displayQuiz() {
+  appName.textContent = 'simple quiz';
+  container.appendChild(appName);
+  container.appendChild(line);
   quizDisplay.textContent = quizzes[`quiz${index}`].question;
-
+  container.appendChild(quizDisplay);
   for (let i = 0; i < 4; i++) {
-    let options = document.createElement('button');
-    options.textContent = quizzes[`quiz${index}`].options[i];
+  let options = document.createElement('button');
+  options.textContent = quizzes[`quiz${index}`].options[i];
+  container.appendChild(options);
 
-    container.appendChild(options);
+  options.addEventListener('click', () => {
+    if (options.textContent === quizzes[`quiz${index}`].answer) {
+      options.style.background = 'green';
+      score++;
+    } else {
+      options.style.background = 'red';
+      document.querySelectorAll('button').forEach(button => {
+        if (button.textContent === quizzes[`quiz${index}`].answer) {
+          button.style.background = 'green';
+        }
+      });
+    }
 
-    options.addEventListener('click', () => {
-      if (options.textContent === quizzes[`quiz${index}`].answer) {
-        options.style.background = 'green';
-        quizDisplay.textContent = 'Correct!';
-let nextButton = document.createElement('button');
-        nextButton.textContent = 'Next';
-        nextButton.classList.add('next-button');
-        container.appendChild(nextButton);
-        nextButton.addEventListener('click', () => {
-          index++;
-          container.innerHTML = '';
-          displayQuiz();
-        });
-      } else {
-        alert('Incorrect. Try again!');
-      }
+    document.querySelectorAll('button').forEach(button => {
+      button.disabled = true;
     });
-  }
+
+    if (index < Object.keys(quizzes).length) {
+      let nextButton = document.createElement('button');
+      nextButton.textContent = 'Next';
+      nextButton.classList.add('next-button');
+      container.appendChild(nextButton);
+
+      nextButton.addEventListener('click', () => {
+        index++;
+        container.innerHTML = '';
+        displayQuiz();
+      });
+    } else {
+      endQuiz();
+    }
+  });
+}
 }
 
-// Start the quiz
+// Function to display end of quiz and play again functionality
+function endQuiz() {
+  quizDisplay.textContent = `You scored ${score} out of ${Object.keys(quizzes).length}`;
+
+  let playAgainButton = document.createElement('button');
+  playAgainButton.textContent = 'PLAY AGAIN';
+  playAgainButton.classList.add('play-again');
+  playAgainButton.addEventListener('click', () => {
+    index = 1;
+    score = 0;
+    container.innerHTML = '';
+    displayQuiz();
+  });
+
+  container.appendChild(playAgainButton);
+}
+
 displayQuiz();
